@@ -1,5 +1,10 @@
 # ML Benchmark — Rigorous Comparison of Classical Machine Learning Algorithms
 
+![Python](https://img.shields.io/badge/Python-3.10%2B-blue?logo=python&logoColor=white)
+![License](https://img.shields.io/badge/License-MIT-green)
+![Status](https://img.shields.io/badge/Status-Active-brightgreen)
+![Stack](https://img.shields.io/badge/Stack-scikit--learn%20%7C%20XGBoost%20%7C%20SHAP-orange)
+
 A systematic comparison of 8 machine learning algorithms on real-world datasets,
 with mathematical derivations, cross-validation, and interpretability analysis.
 
