@@ -171,6 +171,39 @@ python benchmark.py --task classification
 python benchmark.py --task regression
 ```
 
+## Pipeline Interconnections
+
+The benchmark has a strict dependency order — a bug in preprocessing silently
+corrupts every model's score downstream:
+
+```
+src/preprocessing.py  →  build_preprocessor()
+  ├─ identifies numeric vs categorical columns (including pandas CategoricalDtype)
+  ├─ numeric: SimpleImputer(median) + StandardScaler
+  ├─ categorical: SimpleImputer(most_frequent) + OneHotEncoder
+  └─ preprocessor is embedded in every model Pipeline — features are NOT
+     pre-computed once; each model gets its own copy, ensuring no leakage
+        ↓
+src/models.py  →  build_models() + hyperparameter grids
+  └─ model definitions reference the preprocessor above; changing the
+     encoding strategy requires regenerating all model pipelines
+        ↓
+src/evaluation.py  →  cross_validate_models()
+  ├─ stratified 5-fold CV keeps class ratios equal across folds
+  ├─ RandomizedSearchCV (50 iterations) uses the same CV splits
+  └─ all n_jobs set to 1 — see platform notes below
+        ↓
+src/visualization.py  →  plots saved to results/
+```
+
+## Platform Notes
+
+| Note | Detail |
+|------|--------|
+| **n\_jobs=1 throughout** | RandomizedSearchCV and cross_val_score both use `n_jobs=1`. On Windows with limited virtual memory, parallel joblib workers crash with WinError 1455 (paging file too small). Set `n_jobs=-1` on Linux/Mac with sufficient RAM for 3–5× speedup. |
+| **OpenML download** | Adult Income dataset is fetched from OpenML on first run (~4 MB). California Housing is built into sklearn (no download). |
+| **CategoricalDtype detection** | OpenML returns some columns as `pd.CategoricalDtype`, not `object`. The preprocessing step detects both to avoid `ValueError: Cannot use median strategy with non-numeric data`. |
+
 ## Results (Classification — Adult Income)
 
 | Model | Accuracy | F1 | AUC |
