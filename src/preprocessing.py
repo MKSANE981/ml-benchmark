@@ -26,7 +26,12 @@ def identify_feature_types(df: pd.DataFrame, target: str) -> tuple[list, list]:
     features = [c for c in df.columns if c != target]
     numeric, categorical = [], []
     for col in features:
-        if df[col].dtype == object or df[col].nunique() <= 20 and df[col].dtype in ("int32", "int64"):
+        is_cat = (
+            df[col].dtype == object
+            or isinstance(df[col].dtype, pd.CategoricalDtype)
+            or (df[col].nunique() <= 20 and df[col].dtype in ("int32", "int64"))
+        )
+        if is_cat:
             categorical.append(col)
         else:
             numeric.append(col)

@@ -142,13 +142,13 @@ def run_benchmark(models: dict, X, y, task: Literal["classification", "regressio
     evaluator = tune_and_evaluate_classifier if task == "classification" else tune_and_evaluate_regressor
 
     for name, (pipeline, param_grid) in models.items():
-        print(f"  → {name} ...", flush=True)
+        print(f"  -> {name} ...", flush=True)
         result = evaluator(name, pipeline, param_grid, X, y)
         results.append(result)
         if task == "classification":
             print(f"     AUC={result['auc']:.4f}  F1={result['f1']:.4f}  ({result['fit_time_s']:.1f}s)")
         else:
-            print(f"     RMSE={result['rmse']:.4f}  R²={result['r2']:.4f}  ({result['fit_time_s']:.1f}s)")
+            print(f"     RMSE={result['rmse']:.4f}  R2={result['r2']:.4f}  ({result['fit_time_s']:.1f}s)")
 
     df = pd.DataFrame(results)
     sort_col = "auc" if task == "classification" else "rmse"
