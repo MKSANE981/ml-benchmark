@@ -191,7 +191,7 @@ src/models.py  →  build_models() + hyperparameter grids
 src/evaluation.py  →  cross_validate_models()
   ├─ stratified 5-fold CV keeps class ratios equal across folds
   ├─ RandomizedSearchCV (50 iterations) uses the same CV splits
-  └─ all n_jobs set to 1 — see platform notes below
+  └─ parallel jobs (n_jobs=-1) — see platform notes below
         ↓
 src/visualization.py  →  plots saved to results/
 ```
@@ -200,7 +200,7 @@ src/visualization.py  →  plots saved to results/
 
 | Note | Detail |
 |------|--------|
-| **n\_jobs=1 throughout** | RandomizedSearchCV and cross_val_score both use `n_jobs=1`. On Windows with limited virtual memory, parallel joblib workers crash with WinError 1455 (paging file too small). Set `n_jobs=-1` on Linux/Mac with sufficient RAM for 3–5× speedup. |
+| **Runtime** | The SVM and KNN searches dominate the run time on the full dataset: use `--sample` and `--n-iter` to shorten a run. Searches and tree ensembles use all CPU cores (`n_jobs=-1`). On Windows with little virtual memory, parallel workers can crash with WinError 1455: set `n_jobs=1` in `src/models.py` and `src/evaluation.py` in that case. |
 | **OpenML download** | Adult Income dataset is fetched from OpenML on first run (~4 MB). California Housing is built into sklearn (no download). |
 | **CategoricalDtype detection** | OpenML returns some columns as `pd.CategoricalDtype`, not `object`. The preprocessing step detects both to avoid `ValueError: Cannot use median strategy with non-numeric data`. |
 
