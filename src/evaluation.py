@@ -131,7 +131,7 @@ def tune_and_evaluate_regressor(
     }
 
 
-def run_benchmark(models: dict, X, y, task: Literal["classification", "regression"]) -> pd.DataFrame:
+def run_benchmark(models: dict, X, y, task: Literal["classification", "regression"], n_iter: int = 50) -> pd.DataFrame:
     """
     Iterate over all models, tune and evaluate each, return a sorted DataFrame.
 
@@ -143,7 +143,7 @@ def run_benchmark(models: dict, X, y, task: Literal["classification", "regressio
 
     for name, (pipeline, param_grid) in models.items():
         print(f"  -> {name} ...", flush=True)
-        result = evaluator(name, pipeline, param_grid, X, y)
+        result = evaluator(name, pipeline, param_grid, X, y, n_iter=n_iter)
         results.append(result)
         if task == "classification":
             print(f"     AUC={result['auc']:.4f}  F1={result['f1']:.4f}  ({result['fit_time_s']:.1f}s)")

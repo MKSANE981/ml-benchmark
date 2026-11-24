@@ -26,13 +26,17 @@ RESULTS_DIR = Path("results")
 RESULTS_DIR.mkdir(exist_ok=True)
 
 
-def run_classification():
+def run_classification(n_iter=50, sample=None):
     print("\n=== CLASSIFICATION BENCHMARK (Adult Income) ===\n")
     X, y = load_adult_income()
+    if sample and sample < len(X):
+        idx = X.sample(sample, random_state=42).index
+        X, y = X.loc[idx].reset_index(drop=True), y.loc[idx].reset_index(drop=True)
+        print(f"Using a random sample of {sample} rows, n_iter={n_iter}")
     numeric_features, categorical_features = identify_feature_types(X, target="class")
     preprocessor = build_preprocessor(numeric_features, categorical_features, scale=True)
     models = get_classifiers(preprocessor)
-    results = run_benchmark(models, X, y, task="classification")
+    results = run_benchmark(models, X, y, task="classification", n_iter=n_iter)
     results.to_csv(RESULTS_DIR / "classification_results.csv", index=False)
     plot_model_comparison(results, "classification")
     print("\n--- Classification Results ---")
@@ -55,10 +59,12 @@ def run_regression():
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--task", choices=["classification", "regression", "both"], default="both")
+    parser.add_argument("--n-iter", type=int, default=50, help="RandomizedSearchCV iterations")
+    parser.add_argument("--sample", type=int, default=None, help="random subsample size (classification)")
     args = parser.parse_args()
 
     if args.task in ("classification", "both"):
-        run_classification()
+        run_classification(args.n_iter, args.sample)
     if args.task in ("regression", "both"):
         run_regression()
 

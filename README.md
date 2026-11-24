@@ -206,13 +206,22 @@ src/visualization.py  →  plots saved to results/
 
 ## Results (Classification — Adult Income)
 
+Obtained with `python benchmark.py --task classification --n-iter 8 --sample 8000`: a random
+sample of 8,000 rows of Adult Income, 5-fold stratified cross-validation, 8 random-search
+iterations per model (the full 48,000 rows with 50 iterations was too slow for the SVM on a
+laptop). Sorted by AUC.
+
 | Model | Accuracy | F1 | AUC |
 |-------|----------|----|-----|
-| Logistic Regression | 0.851 | 0.848 | 0.901 |
-| KNN (k=9) | 0.833 | 0.829 | 0.876 |
-| SVM (RBF) | 0.857 | 0.854 | 0.909 |
-| Random Forest | 0.863 | 0.861 | 0.926 |
-| Gradient Boosting | 0.872 | 0.870 | 0.934 |
-| **XGBoost** | **0.875** | **0.873** | **0.937** |
+| Gradient Boosting | 0.868 | 0.864 | 0.922 |
+| XGBoost | 0.869 | 0.864 | 0.921 |
+| Random Forest | 0.860 | 0.854 | 0.912 |
+| Logistic Regression | 0.851 | 0.844 | 0.905 |
+| SVM (RBF) | 0.853 | 0.847 | 0.902 |
+| KNN | 0.841 | 0.835 | 0.888 |
+| Decision Tree | 0.851 | 0.844 | 0.882 |
 
-*Results from 5-fold CV. Hyperparameters tuned via RandomizedSearchCV.*
+Reading the table: the two boosting models are tied (differences of 0.001 are noise), and the
+ensembles beat the linear model by about 0.02 AUC. Hyperparameters are tuned and scored on the
+same cross-validation folds (no nested CV), so the scores are slightly optimistic. The
+regression benchmark (California Housing) has not been re-run for this README.
